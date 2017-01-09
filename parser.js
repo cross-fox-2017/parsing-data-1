@@ -1,58 +1,82 @@
 "use strict"
 const fs = require('fs');
 
-var people = []
-var datacsv = fs.readFile('people.csv', 'utf8', (err, data) => {
-  data = data.split("\n");
-  data.forEach(function(val){
-    val = val.split(",")
-    let ini = {
-      id : val[0],
-      firstName : val[1],
-      lastName : val[2],
-      email : val[3],
-      phone : val[4],
-      createdAt : new Date (val[5])
-    }
-    people.push(ini);
-    // console.log(ini);
-  })
-  var writecsv = fs.writeFile('message.txt', datacsv, (err) => {
-    if (err) throw err;
-    console.log('It\'s saved!');
-  });
-});
-console.log(datacsv);
-console.log(people);
-
-
-// class Person {
-//   // Look at the above CSV file
-//   // What attributes should a Person object have?
+// function foo(){
+//   let people = []
+//   let datacsv = fs.readFile('people.csv', 'utf8', (err, data) => {
+//     data = data.split("\n");
+//     data.forEach(function(val){
+//       val = val.split(",")
+//       let ini = {
+//         id : val[0],
+//         firstName : val[1],
+//         lastName : val[2],
+//         email : val[3],
+//         phone : val[4],
+//         createdAt : new Date (val[5])
+//       }
+//       people.push(ini);
+//       // console.log(ini);
+//     });
+//   });
+//     // var writecsv = fs.writeFile('message.txt', datacsv, (err) => {
+//     //   if (err) throw err;
+//     //   console.log('It\'s saved!');
+//   // });
+//   return people
 // }
-//
-// class PersonParser {
-//
-//   constructor(file) {
-//     this._file = file
-//     this._people = null
-//   }
-//
-//   get people() {
-//     // If we've already parsed the CSV file, don't parse it again
-//     // Remember: people is null by default
-//     if (this._people)
-//       return this._people
-//
-//     // We've never called people before, now parse the CSV file
-//     // and return an Array of Person objects here
-//     // Save the Array in the people instance variable.
-//   }
-//
-//   addPerson() {}
-//
-// }
-//
-// let parser = new PersonParser('people.csv')
-//
-// console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
+
+class Person {
+  constructor(id, firstName, lastName, email, phone){
+    this.id = id,
+    this.firstName = firstName,
+    this.lastName = lastName,
+    this.email = email,
+    this.phone = phone,
+    this.createdAt = new Date()
+  }
+}
+class PersonParser {
+  constructor(file) {
+    this._file = fs.readFileSync(file, 'utf8');
+    this._name = file;
+    this._people = null;
+    this.parsedFile = [];
+  }
+  parseFile(){
+    let result = []
+    this._file = this._file.split("\n")
+    this._file.forEach(function(data){
+      data = data.split("\n");
+        data.forEach(function(val){
+          val = val.split(",")
+          let ini = {
+            id : val[0],
+            firstName : val[1],
+            lastName : val[2],
+            email : val[3],
+            phone : val[4],
+            createdAt : new Date (val[5])
+          }
+          result.push(ini);
+        });
+    });
+    return this.parsedFile = result
+  }
+  get people(){
+    return this.parsedFile
+  }
+  get file(){
+    return this._name
+  }
+  addPerson(id, firstName, lastName, email, phone) {
+    this.parsedFile.push(new Person(id, firstName, lastName, email, phone))
+  }
+
+}
+
+let parser = new PersonParser('people.csv')
+parser.parseFile();
+parser.people;
+parser.addPerson(222, "Yoni", "Setiawan", "Yoni@IgoPrint.com", "1-2-34567-9343")
+console.log(`There are ${parser.people.length} people in the file '${parser.file}'.`)
