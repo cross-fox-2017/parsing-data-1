@@ -5,7 +5,7 @@ var csv = require('fast-csv')
 var dataPerson = [];
 var temp = "";
 
-class Person {
+class PersonData {
     constructor(params) {
         this.id = params['id']
         this.first_name = params['first_name']
@@ -32,7 +32,7 @@ class PersonParser {
                     phone: data[4],
                     created_at: data[5]
                 }
-                dataPerson.push(new Person(tampilData))
+                dataPerson.push(new PersonData(tampilData))
             }).on('end', function(data) { // Untuk Menambah Data jika "end" diganti "data" prosesnya akan looping tidak akan berhenti
                 var tambahData = {
                     id: "201",
@@ -42,7 +42,7 @@ class PersonParser {
                     phone: "021-000033333",
                     created_at: new Date()
                 }
-                parser.addPerson(new Person(tambahData))
+                parser.addPerson(new PersonData(tambahData))
                 for (var i = 0; i < dataPerson.length; i++) {
                     if (i == 0) {
                         temp += dataPerson[i].id + "," + dataPerson[i].first_name + "," + dataPerson[i].last_name + "," + dataPerson[i].email + "," + dataPerson[i].phone + "," + dataPerson[i].created_at + "\n";
@@ -50,6 +50,7 @@ class PersonParser {
                         temp += dataPerson[i].id + "," + dataPerson[i].first_name + "," + dataPerson[i].last_name + "," + dataPerson[i].email + "," + dataPerson[i].phone + "," + new Date(dataPerson[i].created_at) + "\n";
                     }
                 }
+                // console.log(dataPerson);
                 console.log(temp);
                 parser.save(temp); //Memasukkan Data ke dalam csv, data awal tidak boleh dalam bentuk csv
             })
