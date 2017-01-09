@@ -12,13 +12,19 @@ var datacsv = fs.readFile('people.csv', 'utf8', (err, data) => {
       lastName : val[2],
       email : val[3],
       phone : val[4],
-      createdAt : val[5]
+      createdAt : new Date (val[5])
     }
     people.push(ini);
+    // console.log(ini);
   })
+  var writecsv = fs.writeFile('message.txt', datacsv, (err) => {
+    if (err) throw err;
+    console.log('It\'s saved!');
+  });
 });
 console.log(datacsv);
 console.log(people);
+
 
 // class Person {
 //   // Look at the above CSV file
