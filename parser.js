@@ -39,7 +39,7 @@ class PersonParser {
                     dataPerson.push(new Person(tampilData))
                 }).on('end', function(data) { // Untuk Menambah Data jika "end" diganti "data" prosesnya akan looping tidak akan berhenti
                     var tambahData = {
-                        id: "203",
+                        id: "204",
                         first_name: "Dila",
                         last_name: "Arista",
                         email: "diladilo@gmail.com",
@@ -64,3 +64,6 @@ class PersonParser {
     }
 
 }
+
+let parser = new PersonParser('people.csv')
+parser.people // menampilkan ge people
