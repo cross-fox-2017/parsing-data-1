@@ -1,5 +1,6 @@
 "use strict"
 const fs = require('fs');
+var faker = require('faker');
 
 // function foo(){
 //   let people = []
@@ -42,6 +43,7 @@ class PersonParser {
     this._name = file;
     this._people = null;
     this.parsedFile = [];
+    this.preSavedData = []
   }
   parseFile(){
     let result = []
@@ -61,16 +63,29 @@ class PersonParser {
           result.push(ini);
         });
     });
-    return this.parsedFile = result
+    return this.parsedFile = result;
   }
   get people(){
-    return this.parsedFile
+    return this.parsedFile;
   }
   get file(){
-    return this._name
+    return this._name;
   }
   addPerson(id, firstName, lastName, email, phone) {
-    this.parsedFile.push(new Person(id, firstName, lastName, email, phone))
+    this.parsedFile.push(new Person(id, firstName, lastName, email, phone));
+  }
+  save(){
+    for (let i = 0; i < this.parsedFile.length; i++){
+      this.preSavedData.push(
+        this.parsedFile[i].id + "," +
+        this.parsedFile[i].firstName + "," +
+        this.parsedFile[i].lastName + "," +
+        this.parsedFile[i].email + "," +
+        this.parsedFile[i].phone + "," +
+        new Date(this.parsedFile[i].createdAt) + "\n"
+      )
+    }
+  fs.writeFileSync('new-people.csv', this.preSavedData);
   }
 
 }
@@ -78,5 +93,6 @@ class PersonParser {
 let parser = new PersonParser('people.csv')
 parser.parseFile();
 parser.people;
-parser.addPerson(222, "Yoni", "Setiawan", "Yoni@IgoPrint.com", "1-2-34567-9343")
+parser.addPerson(201, faker.name.firstName(), faker.name.lastName(), faker.internet.email(), faker.phone.phoneNumber());
+parser.save();
 console.log(`There are ${parser.people.length} people in the file '${parser.file}'.`)
