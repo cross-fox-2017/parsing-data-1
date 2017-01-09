@@ -39,7 +39,7 @@ class PersonParser {
                     dataPerson.push(new Person(tampilData))
                 }).on('end', function(data) { // Untuk Menambah Data jika "end" diganti "data" prosesnya akan looping tidak akan berhenti
                     var tambahData = {
-                        id: "201",
+                        id: "202",
                         first_name: "Dila",
                         last_name: "Arista",
                         email: "diladilo@gmail.com",
@@ -55,8 +55,7 @@ class PersonParser {
                         }
                     }
                     console.log(temp);
-                    parser.save(temp);
-                    parser.save(dataPerson)
+                    parser.save(temp); //Memasukkan Data ke dalam csv, data awal tidak boleh dalam bentuk csv
                 })
         }
     }
