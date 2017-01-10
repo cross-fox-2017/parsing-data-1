@@ -1,7 +1,7 @@
 "use strict"
 
-const csv = require('csv-parser')
 const fs = require('fs')
+const csv = require("fast-csv")
 
 class Person {
   constructor(id,first_name,last_name,email,phone,created_at) {
@@ -27,32 +27,30 @@ class PersonParser {
   get people() {
     // If we've already parsed the CSV file, don't parse it again
     // Remember: people is null by default
-    // if (this._people)
-    //   return this._people
+    if (this._people)
+      return this._people
 
-    let data = []
+    let peopleList;
+    peopleList = fs.readFileSync(this._file, 'utf-8').split('\n')
+    peopleList = peopleList.slice(1, peopleList.length - 1)
 
-    let cookieList = fs.readFileSync(filename, 'utf-8').trim().split("\n")
-    fs.readFile(this._file, "utf-8", function(err, arr2){
-      arr2 = arr2.split('\n').slice(1, arr2.length - 1)
-      let arr = [];
-      data = []
-      for(let i = 0; i < arr2.length; i++){
-        arr.push(arr2[i].split(','));
-      }
-      for(let i = 0; i < arr.length; i++){
-        data.push({
-          id: arr[i][0],
-          first_name: arr[i][1],
-          last_name: arr[i][2],
-          email: arr[i][3],
-          phone: arr[i][4],
-          created_at: arr[i][5]
-        })
-      }
-      console.log(data)
-    })
-    return data
+    let people = [];
+
+    for(let i = 0; i < peopleList.length; i++){
+      people.push(peopleList[i].split(','));
+    }
+
+    for(let i = 0; i < people.length; i++){
+      this.data.push({
+        id: people[i][0],
+        first_name: people[i][1],
+        last_name: people[i][2],
+        email: people[i][3],
+        phone: people[i][4],
+        created_at: people[i][5]
+      })
+    }
+    return this.data
 
     // return data
     // We've never called people before, now parse the CSV file
@@ -61,20 +59,19 @@ class PersonParser {
   }
 
   addPerson(id,first_name,last_name,email,phone,created_at) {
-    let obj = {
-      id: id,
-      first_name: first_name,
-      last_name: last_name,
-      email: email,
-      phone: phone,
-      created_at: created_at
-    }
-    return obj
+    this._people.push(id,first_name,last_name,email,phone,created_at);
+  }
+
+  save() {
+    let save = fs.createWriteStream("newPeople.csv");
+    csv.write(this._people).pipe(save);
   }
 }
 
 let parser = new PersonParser('people.csv')
-parser.addPerson(201, 'Ida Bagus', 'Chahya Dhegana', 'dhegana@gmail.com', '08129042724', '2014-02-10T03:53:40-07:00')
-
 console.log(parser.people);
-// console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
+let gana = new Person(201, 'Ida Bagus', 'Chahya Dhegana', 'dhegana@gmail.com', '08129042724', '2014-02-10T03:53:40-07:00')
+parser.addPerson(gana)
+parser.save()
+
+console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
