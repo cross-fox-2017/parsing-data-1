@@ -1,6 +1,7 @@
 "use strict"
 
 let fs = require("fs");
+let csv = require("fast-csv")
 
 class Person {
   // Look at the above CSV file
@@ -57,8 +58,8 @@ class PersonParser {
   }
 
   save() {
-    // console.log(this._people.toString());
-    // fs.writeFileSync("people.csv", , "utf8");
+    let ws = fs.createWriteStream("people2.csv");
+    csv.write(this._people).pipe(ws);
   }
 }
 
@@ -67,6 +68,6 @@ let data = parser.people;
 let fadly = new Person(0, "fadly", "kayo", "f_kayo@yahoo.com", "+49-176-811-36-108", "Tue, 10.01.2017");
 parser.addPerson(fadly);
 console.log(data);
-// parser.save();
+parser.save();
 
 console.log(`There are ${parser.people.length} people in the file '${parser.file}'.`)
