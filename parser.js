@@ -1,7 +1,7 @@
 "use strict"
 
-var csv = require('csv-parser')
-var fs = require('fs')
+const csv = require('csv-parser')
+const fs = require('fs')
 
 class Person {
   constructor(id,first_name,last_name,email,phone,created_at) {
@@ -32,6 +32,7 @@ class PersonParser {
 
     let data = []
 
+    let cookieList = fs.readFileSync(filename, 'utf-8').trim().split("\n")
     fs.readFile(this._file, "utf-8", function(err, arr2){
       arr2 = arr2.split('\n').slice(1, arr2.length - 1)
       let arr = [];
