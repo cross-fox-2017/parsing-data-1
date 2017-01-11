@@ -40,7 +40,7 @@ class PersonParser {
       person.last_name = editData[i+2];
       person.email = editData[i+3];
       person.phone = editData[i+4];
-      person.created_at = editData[i+5];
+      person.created_at = new Date (editData[i+5]);
       fileData.push(person);
     }
     this._people = fileData;
@@ -54,7 +54,7 @@ class PersonParser {
   }
 
   addPerson(add = {}) {
-    this._people.unshift(add);
+    this._people.push(add);
   }
 
   save() {
@@ -67,7 +67,6 @@ let parser = new PersonParser('people.csv');
 let data = parser.people;
 let fadly = new Person(0, "fadly", "kayo", "f_kayo@yahoo.com", "+49-176-811-36-108", "Tue, 10.01.2017");
 parser.addPerson(fadly);
-console.log(data);
 parser.save();
 
-console.log(`There are ${parser.people.length} people in the file '${parser.file}'.`)
+console.log(`There are ${data.length} people in the file '${parser.file}'.`)
