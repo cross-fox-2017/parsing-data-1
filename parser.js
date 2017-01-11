@@ -58,13 +58,13 @@ class PersonParser {
     // Save the Array in the people instance variable.
   }
 
-  addPerson(id,first_name,last_name,email,phone,created_at) {
-    this._people.push(id,first_name,last_name,email,phone,created_at);
+  addPerson(x = {}) {
+    this.data.push(x);
   }
 
   save() {
     let save = fs.createWriteStream("newPeople.csv");
-    csv.write(this._people).pipe(save);
+    csv.write(this.data).pipe(save);
   }
 }
 
