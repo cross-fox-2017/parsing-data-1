@@ -1,9 +1,30 @@
 "use strict"
 
+const fs = require('fs');
+const csv = require("fast-csv");
+
+let dataPerson = []
+let dataString = ''
+
 class Person {
-  // Look at the above CSV file
-  // What attributes should a Person object have?
+  constructor(person){
+  this.userId = person['userId'];
+  this.first_name = person['first_name'];
+  this.last_name = person['last_name'];
+  this.email = person['email'];
+  this.phone = person['phone'];
+  this.created_at = person['created_at'];
+  }
 }
+
+let person = new Person({
+  userId:202,
+  first_name:'mangku',
+  last_name:'widodo',
+  email:'mangkuwi26@gmail.com',
+  phone:0-633-389-7170,
+  created_at:"2016-12-03T12:00:00"
+})
 
 class PersonParser {
 
@@ -13,20 +34,34 @@ class PersonParser {
   }
 
   get people() {
-    // If we've already parsed the CSV file, don't parse it again
-    // Remember: people is null by default
-    if (this._people)
-      return this._people
+    csv.fromPath(this._file).on("data", function(data){
+    dataPerson.push(new Person({userId: data[0], first_name: data[1], last_name: data[2], email:data[3], phone: data[4], created_at: data[5]}))
+   })
+   .on("end", function(){
+     parser.addPerson(person)
+     for (var i = 0; i < dataPerson.length; i++) {
+       dataString += dataPerson[i].userId + ',' + dataPerson[i].first_name+","
+       +dataPerson[i].last_name+","+dataPerson[i].email+","+dataPerson[i].phone+","
+       +new Date(dataPerson[i].created_at)+"\n";
+     }
+    //  console.log(dataString);
+     parser.save(dataString);
+   });
 
-    // We've never called people before, now parse the CSV file
-    // and return an Array of Person objects here
-    // Save the Array in the people instance variable.
+  if (this._people)
+    return this._people;
   }
 
-  addPerson() {}
+
+  addPerson() {
+    dataPerson.push(person)
+  }
+  save(){
+    fs.writeFile('people.csv', dataString)
+  }
 
 }
 
 let parser = new PersonParser('people.csv')
-
-console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
+parser.people
+// console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
