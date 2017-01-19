@@ -1,16 +1,17 @@
 "use strict"
 const fs = require('fs');
+const csv = require('fast-csv');
 
 class Person {
   // Look at the above CSV file
   // What attributes should a Person object have?
-  constructor(id,first_name,last_name,email,phone,created_at) {
+  constructor(id,first_name,last_name,email,phone) {
     this.id = id
     this.first_name = first_name
     this.last_name = last_name
     this.email = email
     this.phone = phone
-    this.created_at = created_at
+    this.created_at = new Date()
   }
 }
 
@@ -22,7 +23,7 @@ class PersonParser {
     this.data = []
   }
 
-  people(callback) {
+  get people() {
     // If we've already parsed the CSV file, don't parse it again
     // Remember: people is null by default
     if (this._people)
@@ -30,35 +31,33 @@ class PersonParser {
     // We've never called people before, now parse the CSV file
     // and return an Array of Person objects here
     // Save the Array in the people instance variable.
-    let csv = fs.readFile("people.csv", 'utf8', (err, data) => {
-      if (err) throw err;
-      callback(data);
-      console.log(this.data);
-      console.log(`There are ${this.data.length} people in the file '${this._file}'.`)
-    })
+    let csv = fs.readFileSync(this._file, 'utf8').split('\n')
+    let arr = []
+    for (var i = 0; i < csv.length; i++) {
+      arr.push(csv[i].split(','))
+    }
+    arr = arr.splice(1, arr.length-1)
+
+    for (var j = 0; j < arr.length; j++) {
+      this.data.push(new Person(arr[j][0],arr[j][1],arr[j][2],arr[j][3],arr[j][4],arr[j][5]))
+    }
+    return this.data
   }
 
-  addPerson(id,first_name,last_name,email,phone,created_at) {
-    let orang = new Person(id,first_name,last_name,email,phone,created_at)
+  addPerson(orang) {
     this.data.push(orang)
+  }
+
+  save() {
+    let save = fs.createWriteStream("newPeople.csv")
+    csv.write(this.people).pipe(save)
   }
 
 }
 
 let parser = new PersonParser('people.csv')
-parser.people(function(data){
-  for (var i = 1; i < data.split('\n').length -1; i++ ) {
-    let id = data.split('\n')[i].split(',')[0]
-    let first_name = data.split('\n')[i].split(',')[1]
-    let last_name = data.split('\n')[i].split(',')[2]
-    let email = data.split('\n')[i].split(',')[3]
-    let phone = data.split('\n')[i].split(',')[4]
-    let created_at = data.split('\n')[i].split(',')[5]
+let orang = new Person(201,'muhammad','iqbal','iqbal@a.com','08123123')
 
-    let orang = new Person(id,first_name,last_name,email,phone,created_at)
-    parser.data.push(orang);
-  }
-})
-
-parser.addPerson(201,'muhammad','iqbal','iqbal@a.com','08123123','2013-02-12T11:49:28-08:00')
-console.log(parser.data)
+parser.addPerson(orang)
+parser.save()
+console.log(`There are ${parser.data.length} people in the file '${parser._file}'.`);
