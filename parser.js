@@ -43,7 +43,7 @@ class PersonParser {
     this._name = file;
     this._people = null;
     this.parsedFile = [];
-    this.preSavedData = []
+    this.preSavedData = [`id,first_name,last_name,email,phone,created_at\n`]
   }
   parseFile(){
     let result = []
@@ -51,16 +51,18 @@ class PersonParser {
     this._file.forEach(function(data){
       data = data.split("\n");
         data.forEach(function(val){
-          val = val.split(",")
-          let ini = {
-            id : val[0],
-            firstName : val[1],
-            lastName : val[2],
-            email : val[3],
-            phone : val[4],
-            createdAt : new Date (val[5])
+          if(val.length>0){
+            val = val.split(",")
+            let ini = {
+              id : val[0],
+              firstName : val[1],
+              lastName : val[2],
+              email : val[3],
+              phone : val[4],
+              createdAt : new Date (val[5])
+            }
+            result.push(ini);
           }
-          result.push(ini);
         });
     });
     return this.parsedFile = result;
@@ -75,24 +77,24 @@ class PersonParser {
     this.parsedFile.push(new Person(id, firstName, lastName, email, phone));
   }
   save(){
-    for (let i = 0; i < this.parsedFile.length; i++){
+    for (let i = 1; i < this.parsedFile.length; i++){
       this.preSavedData.push(
         this.parsedFile[i].id + "," +
         this.parsedFile[i].firstName + "," +
         this.parsedFile[i].lastName + "," +
         this.parsedFile[i].email + "," +
         this.parsedFile[i].phone + "," +
-        new Date(this.parsedFile[i].createdAt) + "\n"
+        this.parsedFile[i].createdAt.toJSON() + "\n"
       )
     }
-  fs.writeFileSync('new-people.csv', this.preSavedData);
+  fs.writeFileSync('people-copy.csv', this.preSavedData.join(""));
   }
 
 }
 
-let parser = new PersonParser('people.csv')
+let parser = new PersonParser('people-copy.csv')
 parser.parseFile();
-parser.people;
-parser.addPerson(201, faker.name.firstName(), faker.name.lastName(), faker.internet.email(), faker.phone.phoneNumber());
+parser.addPerson(parser.people.length, faker.name.firstName(), faker.name.lastName(), faker.internet.email(), faker.phone.phoneNumber());
+parser.people
 parser.save();
-console.log(`There are ${parser.people.length} people in the file '${parser.file}'.`)
+console.log(`There are ${parser.people.length-1} people in the file '${parser.file}'.`)
