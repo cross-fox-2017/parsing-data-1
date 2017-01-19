@@ -1,8 +1,16 @@
 "use strict"
+let fs = require('fs');
+let csv = require('fast-csv');
 
 class Person {
-  // Look at the above CSV file
-  // What attributes should a Person object have?
+  constructor(id,firstName,lastName,email,phone) {
+    this.id = id
+    this.firstName = firstName
+    this.lastName = lastName
+    this.email = email
+    this.phone = phone
+    this.created_at = new Date()
+  }
 }
 
 class PersonParser {
@@ -10,23 +18,38 @@ class PersonParser {
   constructor(file) {
     this._file = file
     this._people = null
+    this.data = []
   }
 
   get people() {
-    // If we've already parsed the CSV file, don't parse it again
-    // Remember: people is null by default
     if (this._people)
       return this._people
 
-    // We've never called people before, now parse the CSV file
-    // and return an Array of Person objects here
-    // Save the Array in the people instance variable.
+    let csv = fs.readFileSync(this._file, 'utf8').split('\n')
+    let arr = []
+    for (let i = 0; i < csv.length; i++) {
+      arr.push(csv[i].split(','))
+    }
+    arr = arr.splice(1, arr.length-1)
+
+    for (let j = 0; j < arr.length; j++) {
+      this.data.push(new Person(arr[j][0],arr[j][1],arr[j][2],arr[j][3],arr[j][4],arr[j][5]))
+    }
+    return this.data
   }
 
-  addPerson() {}
+  addPerson(val) {
+    this.data.push(val)
+  }
+
+  save() {
+    let save = fs.createWriteStream("peopleNew.csv")
+    csv.write(this.people).pipe(save)
+  }
 
 }
 
 let parser = new PersonParser('people.csv')
-
-console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
+parser.addPerson( new Person(201,'yoma','sofwan','yomaswn@gmail.com','089694026806'))
+parser.save()
+console.log(`There are ${parser.data.length} people in the file '${parser._file}'.`)
