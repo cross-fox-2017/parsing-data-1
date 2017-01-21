@@ -1,5 +1,6 @@
 "use strict"
 const fs = require('fs');
+const fast_csv = require('fast-csv')
 
 class Person {
   // Look at the above CSV file
@@ -22,48 +23,47 @@ class PersonParser {
     this.data = []
   }
 
-  people(callback) {
-    // If we've already parsed the CSV file, don't parse it again
-    // Remember: people is null by default
-    let csv = fs.readFile('people.csv', 'utf8', (err, data) => {
-      if (err) return console.error(err);
-      callback(data)
-      console.log(this.data);
-      console.log(`There are ${this.data.length} people in the file '${this._file}'`);
-    });
+  people() {
+    if (this._people) {
+      return this._people
+    }
+    let csv = fs.readFileSync(this._file, 'utf8').split('\n')
+    let temp = []
+    for (var i = 0; i < csv.length; i++) {
+      temp.push(csv[i].split(','))
+    }
+    temp = temp.splice(1, temp.length-1)
+    //return temp
+
+    for (var j = 0; j < temp.length; j++) {
+      this.data.push({
+      id: temp[j][0],
+      first_name: temp[j][1],
+      last_name: temp[j][2],
+      email: temp[j][3],
+      phone: temp[j][4],
+      created_at: temp[j][5]
+      })
+    }
+    return this.data
   }
 
-  addPerson(id,first_name,last_name,email,phone, created_at) {
-    let newPerson = new Person(id,first_name,last_name,email,phone, created_at)
-    this.data.push(newPerson)
+  save() {
+    let save = fs.createWriteStream("new_people.csv")
+    fast_csv.write(this.data).pipe(save)
   }
-    // We've never called people before, now parse the CSV file
-    // and return an Array of Person objects here
-    // Save the Array in the people instance variable.
+
+  addPerson(add ={}) {
+    this.data.push(add)
+  }
+
 }
 
 
-
-
 let parser = new PersonParser('people.csv')
-parser.people( function(data) {
-  let dataSplit = data.split('\n')
-  for (var i = 1; i < dataSplit.length; i++) {
-    let parserId = dataSplit[i].split(',')[0]
-    let parserFirst_name = dataSplit[i].split(',')[1]
-    let parserLast_name = dataSplit[i].split(',')[2]
-    let parserEmail = dataSplit[i].split(',')[3]
-    let parserPhone = dataSplit[i].split(',')[4]
-    let parserCreated_at = dataSplit[i].split(',')[5]
+let raditya = new Person(201,'Raditya','Pradipta','me@raditya.com','08561234567','2017-11-11T11:49:28-09:00')
 
-    let orang = new Person(parserId,parserFirst_name,parserLast_name, parserEmail, parserPhone, parserCreated_at)
-    parser.data.push(orang)
-  }
-})
-//
-// let parser = new PersonParser('people.csv')
-//
-// console.log(`There are ${parser.people.size} people in the file '${parser.file}'.`)
+console.log(`There are ${parser.people().length} people in the file '${parser._file}'`)
 
-parser.addPerson(201,'Raditya','Pradipta','me@raditya.com','08561234567','2017-11-11T11:49:28-09:00')
-console.log(parser.data)
+parser.addPerson(raditya)
+parser.save()
